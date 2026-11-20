@@ -1,8 +1,106 @@
-# Concentric — see music on a circle
+# Concentric · Music on wheels
 
-An interactive music-theory studio: rhythm, harmony and melody drawn as concentric rings you can hear, edit and compare. Plain HTML, CSS and JavaScript modules. No build step to run it, and no external CDNs.
+**See music, hear it, and make your own: rhythm, harmony and melody drawn as rings on a wheel.**
 
-## Run it locally
+▶ **Try it:** [sunboo.github.io/musiconwheels](https://sunboo.github.io/musiconwheels/). Free, no sign-up, works on any phone or laptop, and offline after the first visit.
+
+<p align="center">
+  <img src="docs/screenshot-desktop.jpg" alt="Pachelbel's Canon in D drawn as four coloured rings, with the needle sweeping round the beats" width="72%">
+  &nbsp;
+  <img src="docs/screenshot-phone.jpg" alt="Teentaal on a phone: tabla bols on the dots, with sam (X) and khali (0) marked on the rim" width="22%">
+</p>
+
+---
+
+## What it is
+
+Concentric turns a piece of music into a wheel you can watch while it plays.
+
+- **Around the wheel is time.** One trip round is one loop; the numbers on the rim are the beats.
+- **Each ring is a part.** Bass on the outside, chords in the middle, melody inside, drums on their own ring.
+- **Each dot is a note.** Its colour is the pitch, its brightness the octave, its size how loud it is. A halo means a chord.
+
+Because the pattern stays still while a needle sweeps round, you can *see* things that are hard to hear at first: why a waltz feels like a waltz, why a clave pulls, why one changed note makes a chord sad. Then you can change it yourself and hear the difference straight away.
+
+It's built for curious beginners, school students, teachers and anyone who wants to understand the music they love, in a few minutes a day.
+
+## What you can do
+
+**Learn**
+- **36 short lessons in 8 modules:** pulse and metre, pitch and colour, chords, progressions and cadences, song structure, polyrhythm, Indian taal and raga, and blues and swing.
+- Each lesson plays at once, explains "why it works" in plain words, and often has two versions to compare, such as a straight and a swung beat.
+- Tools that help it stick:
+  - **Ear check:** can you tell which version is playing?
+  - **Show the notes:** the melody written on a staff.
+  - **Badges and progress:** ticks for finished lessons and a few small awards.
+
+**Play songs**
+- **About 40 pieces, almost all in the public domain:**
+  - **Nursery rhymes:** Twinkle Twinkle, Frère Jacques, Happy Birthday and more.
+  - **Holiday songs:** Jingle Bells, Silent Night, Auld Lang Syne and more.
+  - **Folk tunes:** Sakura, Amazing Grace, Korobeiniki and more.
+  - **Classical moments:** Pachelbel's Canon, Für Elise, Beethoven's 5th, Mountain King, Holst's Mars, Zarathustra and more.
+- **Anthem openings** (USA, UK), which are play-only.
+- **★ Daily puzzle:** name today's mystery tune in three tries, keep a streak, and share your score.
+
+**Create**
+- Start from a template (pop, electronic, waltz, polyrhythm or blank) and paint notes and chords onto the rings.
+- Press **✦ Random Groove** for an instant idea, then make it yours.
+- **Remix** anything: add swing, speed up every loop, build up one ring at a time, or flip major ↔ minor.
+
+**Share and teach**
+- **Share a link** that carries your version inside it. Nothing is uploaded.
+- **Save a video** (9:16, for Reels and Shorts) or a **poster** with the name of your piece and your name as composer.
+- **Embed** the player on a blog or course page.
+- **Projector view** for classrooms.
+- **Assignment links** that show your task above the wheel.
+
+**For everyone**
+- Works with the keyboard and screen readers.
+- Note letters on the dots for colour-blind users.
+- A visual beat flash for Deaf and hard-of-hearing users.
+- A Lite mode for older phones.
+- Headphone sync for Bluetooth delay.
+- Sa Re Ga note names in the Indian music lessons.
+
+## Privacy and rights
+
+- **No accounts, no cookies, no ads.** Your edits and progress stay in your own browser. Optional visit counts are anonymous and cookie-free. See the [privacy page](https://sunboo.github.io/musiconwheels/privacy.html).
+- **Music rights:**
+  - Songs are either in the public domain (arranged by us, melodies only, never lyrics) or very short educational arrangements.
+  - Two songs whose riffs are still under copyright can be played but not shared or exported.
+  - National anthems are openings only, play-only, and only where the law allows.
+  - See the [terms and takedown page](https://sunboo.github.io/musiconwheels/terms.html).
+
+## What's next
+
+Released versions and the plan (more public-domain songs, more anthems, deeper learning tools) are in **[ROADMAP.md](ROADMAP.md)**. Each release is described in [CHANGES.md](CHANGES.md).
+
+Ideas, bugs or a song you'd like to see? Open an issue in this repository.
+
+## Licence
+
+- **Code:** [MIT](LICENSE).
+- **Lesson text and arrangements:** [CC BY-NC 4.0](CONTENT-LICENSE.md). Free to share and adapt for non-commercial use, with credit.
+- **Credits and third-party notices:** [NOTICE.txt](NOTICE.txt).
+
+Concentric is not affiliated with any artist, label, publisher, studio, school or government. Names are used only to identify the music being studied.
+
+---
+
+<details>
+<summary><strong>For developers: how it's built, how to run it, how to change it</strong></summary>
+
+### How it's built
+
+Plain HTML, CSS and JavaScript modules. No framework, no build step to run it, and no external CDNs.
+
+- **Sound:** synthesised in the browser with the Web Audio API. Short sounds are rendered once and reused.
+- **Timing:** a look-ahead scheduler runs on the audio clock, so notes land exactly on the grid even on slow phones.
+- **Drawing:** two stacked canvases. The still parts are drawn once, and nothing is redrawn while paused.
+- **Size:** the whole app is about 105 KB compressed, under a 200 KB budget that is checked automatically.
+
+### Run it locally
 
 ES modules don't load from `file://`, so serve the folder:
 
@@ -11,140 +109,104 @@ python3 -m http.server 8765
 # open http://localhost:8765
 ```
 
-## Publish on GitHub Pages
+### Publish (GitHub Pages)
 
-1. Create a repository (e.g. `concentric`) and upload everything in this folder to it: drag the files into "Add file → Upload files" on github.com, or `git push`.
-2. In the repository go to **Settings → Pages**. Under "Build and deployment" choose **Deploy from a branch**, branch **main**, folder **/ (root)**, then **Save**.
-3. After a minute the site is live at `https://sunboo.github.io/musiconwheels/`.
+1. In **Settings → Pages**, choose **Deploy from a branch**, branch **main**, folder **/ (root)**.
+2. After every change, raise `VERSION` in `sw.js` (e.g. `v3.1.0` → `v3.1.1`) so returning visitors get the update.
+3. If lessons change, re-run `node tools/seo.mjs https://sunboo.github.io/musiconwheels` to refresh the search pages and `sitemap.xml`.
 
-The `.nojekyll` file tells GitHub to serve the files as-is. A free account requires a public repository, so the code and song data are visible to anyone.
+The `.nojekyll` file tells GitHub to serve the files as they are.
 
-## Using it
-
-- **Play / Pause:** Space. **Tap tempo:** T, or tap TAP in the centre. **Undo / Redo:** Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z.
-- **Edit** makes your own version of any lesson or song. It is saved automatically in this browser. **Hold for original** compares it with the original; **Reset** throws your edits away.
-- **On the wheel:** click a dot to add or remove it. Long-press, right-click or Alt-click a dot to change its note, chord, length or accent. With the keyboard: Tab to the wheel, arrow keys to move, Enter to add or remove, E to open the note editor.
-- **Create** (header switch, or "Create From Scratch" in the dropdown) starts from one of five templates. Paint with the Note & Chord Brush, press ✦ Random Groove for an instant idea, and Undo or Clear All as you go.
-- **Library** (the button with the current title, or press **L**): search every lesson and song, filter by category, star favourites, see recent items, ticks for finished lessons and your badges.
-- **★ Daily**: a name-that-tune puzzle, the same tune for everyone each day, three tries, with a streak and a result you can copy.
-- **⋯ → Learn**: *Show the notes* (the melody on a staff with chord symbols), *Ear check* (on lessons with Compare buttons) and *Remix* (swing, faster each loop, build up, shift the melody, swap instruments, major ↔ minor, melody up an octave).
-- **⋯ → Share**: a link that carries your edited version inside it (nothing is uploaded), embed code, a projector link and an assignment link with your task on top; a 9:16 video for Reels/Shorts (MP4 where the browser supports it, otherwise WebM); a poster PNG.
-- **Anthems** are play-only: no editing, remixing or Random Groove.
-- **Layers** opens mute and solo for each ring. **⋯** holds recording, preset files, Settings and "How to read the circle".
-- **Settings:** quality (Auto / Lite / Full), colours (rainbow or circle of fifths), note letters on dots, vibration, *See the beat* (flashes the wheel edge on every beat, for Deaf and hard-of-hearing users), and headphone sync for Bluetooth delay. Module 7 lessons add a Western / Sargam switch in the guide.
-- **Offline:** after the first visit the app works without a connection and can be installed ("Add to Home Screen" / "Install app"). When you publish changes, bump `VERSION` in `sw.js` so returning visitors get them.
-
-## Usage counts (optional)
-
-Cookie-free page and event counts with [GoatCounter](https://www.goatcounter.com) (free for small sites). Create a site there, then put its code in `js/config.js`:
-
-```js
-export const CONFIG = { goatcounter: 'your-code' };
-```
-
-The app then counts these events (they appear in GoatCounter as paths starting with `event/`):
-
-| Area | Events |
-|---|---|
-| Visits | `first-visit`, `return-d1`, `return-d7`, `return-d30` |
-| Listening and learning | `play`, `lesson-complete` (two full loops), `notes`, `ear-right`, `ear-wrong` |
-| Create | `create-open`, `create-first-edit`, `random-groove`, `edit` |
-| Video, poster, audio | `video` (saved), `poster` (saved), `audio-record-start`, `audio-record-saved`, `export` (preset file) |
-| Sharing | `share-open` (share box opened), `share-link-copied`, `share-link-sent` (phone share sheet), `share-embed-copied`, `share-projector-copied`, `share-assignment-copied`, `share-open-link` (someone opened a shared version) |
-| Daily puzzle | `daily-open`, `daily-solved`, `daily-failed`, `daily-result-copied` |
-
-
-## Automatic checks
-
-`.github/workflows/checks.yml` runs the behaviour tests and the performance budget on every push and pull request. Results show under the repository's **Actions** tab. The budget is: timing error ≤ 2 ms at 6× CPU slowdown, ≤ 2 redraws while paused, ≤ 250 audio nodes in 10 s of playback, main thread ≤ 75% busy at 6× slowdown, and no page errors.
-
-## Useful URL options
-
-| URL | What it does |
-|---|---|
-| `?quality=lite` | Lite mode: 30 fps visuals, no blur or reverb, fewer voices, lower sample rate. Chosen automatically on low-memory or slow devices. |
-| `?quality=full` | Force full quality. |
-| `?item=song-canon` | Open a specific lesson, song or template (ids are in `js/content.js`). |
-| `?item=7.4&scene=1` | Open a lesson on a given Compare scene (0-based). |
-| `?embed=1` | Compact player for iframes (used by the embed code). |
-| `?present=1` | Projector view: guide closed, large captions. |
-| `?a=<task>` | Shows a teacher's task on top (assignment links). |
-| `?daily=1` | Opens today's daily puzzle. |
-| `?opener=1` | Shows the first-visit "name this tune" opener again. |
-| `#w=…` | A shared version, packed into the link. |
-| `?debug=1` | Runs the song/lesson data checks (see the console) and freezes the original rings so accidental edits throw. |
-
-## Project layout
+### Project layout
 
 ```
-index.html            markup
-css/app.css           compiled stylesheet (≈7 KB gzipped)
-js/main.js            UI wiring and app state
-js/config.js          site settings (analytics code)
-js/analytics.js       opt-in, cookie-free usage counts
-sw.js                 offline cache
-manifest.webmanifest  install as an app
-js/audio.js           audio engine: cached voices, gated sustain, drums, reverb, limiter
-js/scheduler.js       look-ahead scheduler on the audio clock
-js/clock-worker.js    background-safe tick for the scheduler
-js/render.js          canvas renderer (still layer + moving layer)
-js/theory.js          notes, colours, chords, voice leading, note lengths
-js/content.js         lessons 1.1–6.2, original Famous Songs, Create templates; merges the files below
-js/content-helpers.js makeSteps (shared by the data files)
-js/lessons-extra.js   lessons added in the content pass: 1.7, 2.5, 2.6, 4.4, 5.4, Module 7 (taal & raga), Module 8 (blues)
-js/songs.js           public-domain songs and anthems in a compact text format ("E4:2 D4:2 C4:4" + "C:4 G7:2")
-js/library.js         Library sheet (search, chips, favourites, recents, ticks)
-js/progress.js        progress, badges, daily-puzzle state (this browser only)
-js/share.js           share links (#w=, deflate + base64url)
-js/export.js          poster PNG and 9:16 video export
-js/notation.js        "Show the notes" staff view
-js/groove.js          Random Groove generator
-js/lint.js            data checks (debug only)
-tools/test.mjs        behaviour tests        (Playwright)
-tools/bench.mjs       performance benchmark  (Playwright), incl. a 200 KB gz download budget
-tools/seo.mjs         static page per lesson/song + sitemap.xml + robots.txt
-learn/                generated SEO pages (re-run tools/seo.mjs with your real URL)
-LICENSE, CONTENT-LICENSE.md, NOTICE.txt, privacy.html, terms.html
-ROADMAP.md            released versions and what's next
-tools/css-build/      Tailwind config + source CSS (only needed if you change classes)
+index.html              page markup
+css/app.css             compiled stylesheet
+sw.js                   offline support (bump VERSION on every release)
+manifest.webmanifest    install as an app
+js/main.js              app wiring and state
+js/audio.js             audio engine: synth voices, drums, tabla, reverb, limiter
+js/scheduler.js         look-ahead scheduler on the audio clock (+ swing)
+js/clock-worker.js      background-safe timer for the scheduler
+js/render.js            the wheel (still layer + moving layer)
+js/theory.js            notes, colours, chords, voice leading, note lengths
+js/content.js           lessons 1.1–6.2, original songs, Create templates
+js/lessons-extra.js     lessons 1.7, 2.5, 2.6, 4.4, 5.4 and Modules 7–8
+js/songs.js             public-domain songs and anthems in a compact text format
+js/content-helpers.js   shared helper for the data files
+js/library.js           Library: search, filters, favourites, recents
+js/progress.js          progress, badges, daily puzzle (this browser only)
+js/share.js             share links (#w=…)
+js/export.js            poster and 9:16 video
+js/notation.js          "Show the notes" staff view
+js/groove.js            Random Groove
+js/analytics.js         optional, cookie-free usage counts
+js/config.js            site settings (GoatCounter code)
+js/lint.js              data checks (debug only)
+learn/                  generated search pages, one per lesson and song
+tools/                  tests, benchmark, search-page generator, stylesheet build
+docs/                   screenshots for this README
 ```
 
-## Editing styles
+### Adding a public-domain song
 
-The stylesheet is pre-compiled. If you add or change Tailwind classes in `index.html` or `js/`, rebuild it:
+Add an entry to `SONGS` in `js/songs.js`.
+
+- **Melody:** notes are written `name+octave:length`, e.g. `E4:2 D4:2 C4:4`. Length is in steps; `r` is a rest.
+- **Chords:** written `symbol:beats`, e.g. `C:4 G7:2`. Allowed symbols are `C`, `Am`, `G7`, `Cmaj7`, `Csus4`, `Bdim`, and `N` for no chord.
+- **Rule:** the chords must cover exactly as many beats as the melody, or the song won't load.
+
+Then run the tests: they flag melody notes that clash with the chord.
+
+### Tests, benchmark and styles
+
+```bash
+npm i -D playwright && npx playwright install chromium
+python3 -m http.server 8765 &
+node tools/test.mjs      # behaviour checks
+node tools/bench.mjs     # timing, redraws, audio nodes, CPU at 1× and 6×, download size
+```
+
+`.github/workflows/checks.yml` runs both on every push; results are under the **Actions** tab.
+
+The stylesheet is pre-compiled. If you add or change Tailwind classes, rebuild it:
 
 ```bash
 cd tools/css-build && npm install && npx tailwindcss -c tailwind.config.js -i src.css -o ../../css/app.css --minify
 ```
 
-## Tests and benchmark
+### Useful URL options
 
-```bash
-npm i -D playwright && npx playwright install chromium
-python3 -m http.server 8765 &
-node tools/test.mjs     # behaviour checks
-node tools/bench.mjs    # timing error, idle redraws, audio nodes, main-thread load at 1× and 6× CPU
+| URL | What it does |
+|---|---|
+| `?item=song-canon` | Open a lesson, song or template (ids are in the `js/` data files). |
+| `?item=7.4&scene=1` | Open a lesson on a given Compare version (counting from 0). |
+| `?embed=1` | Compact player for iframes. |
+| `?present=1` | Projector view. |
+| `?a=<task>` | Show a teacher's task (assignment links). |
+| `?daily=1` | Open today's daily puzzle. |
+| `?opener=1` | Show the first-visit "name this tune" opener again. |
+| `?quality=lite` / `full` | Force Lite or Full quality. |
+| `?debug=1` | Run the data checks (see the console). |
+| `#w=…` | A shared version, packed into the link. |
+
+### Usage counts (optional)
+
+Anonymous, cookie-free counts with [GoatCounter](https://www.goatcounter.com). Put your site code in `js/config.js`:
+
+```js
+goatcounter: 'your-code'
 ```
 
-## Search pages (SEO)
+Leave it empty to send nothing. Nothing is sent from localhost or when the browser's Do Not Track is on. Events appear in GoatCounter as `event/…`:
 
-`learn/` holds one static page per lesson and public-domain song, with the interactive player embedded. They are generated, so re-run this with your real address before publishing (and whenever lessons change):
+| Area | Events |
+|---|---|
+| Visits | `first-visit`, `return-d1`, `return-d7`, `return-d30` |
+| Listening and learning | `play`, `lesson-complete`, `notes`, `ear-right`, `ear-wrong` |
+| Create | `create-open`, `create-first-edit`, `random-groove`, `edit` |
+| Video, poster, audio | `video`, `poster`, `audio-record-start`, `audio-record-saved`, `export` |
+| Sharing | `share-open`, `share-link-copied`, `share-link-sent`, `share-embed-copied`, `share-projector-copied`, `share-assignment-copied`, `share-open-link` |
+| Daily puzzle | `daily-open`, `daily-solved`, `daily-failed`, `daily-result-copied` |
 
-```bash
-node tools/seo.mjs https://sunboo.github.io/musiconwheels
-```
-
-Then submit `sitemap.xml` in Google Search Console. Copyrighted songs, anthems and Create templates get no page.
-
-## Adding a public-domain song
-
-Add an entry to `SONGS` in `js/songs.js`. Notes are `name+octave:length` (length in steps, `r` = rest); chords are `symbol:beats` (`C`, `Am`, `G7`, `Cmaj7`, `Csus4`, `Bdim`, `N` for none). The melody's length decides the beats; the chords must cover exactly the same number of beats or the app refuses to load the song. Run `node tools/test.mjs` afterwards: the data lint flags melody notes that clash with the chord.
-
-## Before publishing
-
-- Re-run `tools/seo.mjs` if lessons change.
-- Bump `VERSION` in `sw.js`.
-
-## Song rights
-
-Songs marked **public domain** (Canon in D, Jingle Bells, Brahms' Lullaby, Twinkle Twinkle, and the 28 songs in `js/songs.js`) are our own simplified arrangements. Lyrics are never included: only melodies, which is what is public domain. National anthems are play-only openings; India's anthem is deliberately absent (2016 Supreme Court order on abridged versions), as are anthems whose laws forbid arrangements. Songs marked **educational arrangement** are copyrighted compositions. They are included as short rhythm and harmony studies only, and their melodies are deliberately not extended. Clocks and Billie Jean go one step further: their signature riffs are included, so recording, preset export and sharing are switched off for them (`shareable: false` in `js/content.js`). Get licensing advice before using any of them commercially; this note is not legal advice.
+</details>
