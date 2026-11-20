@@ -1,0 +1,33 @@
+Concentric: credits and notices
+================================
+
+Software
+--------
+- Concentric source code: MIT licence (LICENSE).
+- Stylesheet compiled with Tailwind CSS (MIT licence, (c) Tailwind Labs, Inc.).
+- No other third-party code, fonts, samples or CDNs are bundled. All sounds are synthesised in the browser.
+
+Music
+-----
+- Public-domain works: the compositions listed with "public domain" in the app (Bach, Mozart, Beethoven, Grieg,
+  Bizet, Holst, R. Strauss, Pachelbel, Brahms, traditional and folk melodies, nursery rhymes, hymns).
+  Arrangements are our own and simplified for teaching.
+- "Happy Birthday to You": melody by Mildred and Patty Hill (1893). Treated as public domain after
+  Marya v. Warner/Chappell (C.D. Cal. 2015) and the 2016 settlement.
+- Educational arrangements of copyrighted songs are short, transformed, non-commercial study excerpts.
+  Rights remain with their owners. Clocks and Billie Jean are playable but cannot be shared or exported.
+- National anthems (USA, UK): play-only openings, not editable or remixable.
+- Indian taals and ragas (Teentaal, Jhaptaal, Rupak, Keherwa, Dadra, Bhupali, Yaman) are traditional.
+  Tabla sounds are synthetic approximations.
+
+References
+----------
+- G. Toussaint, The Geometry of Musical Rhythm (CRC Press, 2013): clave and tresillo.
+- I. Newton, Opticks (1704); A. Scriabin, Prometheus: Poem of Fire (1910): colour and pitch.
+
+No affiliation
+--------------
+Concentric is not affiliated with, endorsed by or sponsored by any artist, record label, publisher,
+film or game studio, school, or government. Names are used only to identify the music being studied.
+
+Takedown and contact: see terms.html.
