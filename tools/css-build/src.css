@@ -1,0 +1,209 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+* { box-sizing: border-box; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+html, body {
+  margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
+  background: radial-gradient(circle at 55% 47%, #151923 0%, #0b0d11 72%, #07080b 100%);
+  color: #f4f5f7;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
+}
+/* Panels sit over a canvas that changes every frame: solid fills, no backdrop blur (AR-06). */
+.frosted-panel {
+  background: rgba(18, 22, 29, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 20px 44px -12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+/* Popovers open briefly: blur is affordable on full-quality devices only. */
+.frosted-popover {
+  background: rgba(24, 28, 36, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 28px 60px -10px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+body:not(.lite) .frosted-popover { -webkit-backdrop-filter: blur(20px) saturate(160%); backdrop-filter: blur(20px) saturate(160%); background: rgba(24, 28, 36, 0.92); }
+body.lite .frosted-panel, body.lite .frosted-popover { box-shadow: none; }
+body.lite #grammarModal { -webkit-backdrop-filter: none; backdrop-filter: none; }
+
+.custom-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+.custom-scroll::-webkit-scrollbar-track { background: transparent; }
+.custom-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.14); border-radius: 9999px; }
+
+.rams-btn { background: rgba(255, 255, 255, 0.045); border: 1px solid rgba(255, 255, 255, 0.09); transition: background-color 150ms, border-color 150ms, transform 150ms; cursor: pointer; }
+.rams-btn:hover { background: rgba(255, 255, 255, 0.095); border-color: rgba(255, 255, 255, 0.18); }
+.rams-btn:active { transform: scale(0.97); }
+.rec-on { border-color: rgba(244, 63, 94, 0.6); background: rgba(244, 63, 94, 0.15); color: #fecdd3; }
+
+select.editorial-select {
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239aa2b1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center; padding-right: 24px;
+}
+select option, select optgroup { background-color: #161920; color: #f4f5f7; }
+
+/* Drawer collapses its width so the wheel recentres (LT-10). */
+#lessonDrawer { transition: width 240ms cubic-bezier(0.22, 1, 0.36, 1), margin 240ms, opacity 200ms; }
+#lessonDrawer.drawer-collapsed { width: 0 !important; margin-left: 0; margin-right: 0; opacity: 0; pointer-events: none; border-width: 0; }
+
+/* Type scale: 13 / 15 / 20 px (JI-06) */
+.eyebrow { font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* Fixed-height caption: changing text never moves the controls below it (UX-03). */
+.caption-box { height: 4.3em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+.stage-caption {
+  position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); max-width: min(92%, 680px);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px; color: rgba(255, 255, 255, 0.8);
+  pointer-events: none; display: none; padding: 4px 12px; border-radius: 8px; background: rgba(11, 13, 17, 0.7);
+}
+body.drawer-closed .stage-caption { display: block; }
+body.dock-open .stage-caption { display: none; }
+
+/* A fixed band at the bottom holds the dock or the caption, so opening the dock never resizes the wheel. */
+#wheelStage { padding-bottom: 76px; }
+.dock { position: absolute; left: 0; right: 0; bottom: 0; }
+@media (min-width: 768px) { body.dock-open #lessonDrawer { margin-bottom: 84px; } }
+
+/* Edit toggle and header states (JI-08, DR-03) */
+.edit-toggle { background: rgba(34, 211, 238, 0.08); border: 1px solid rgba(34, 211, 238, 0.35); color: #a5f3fc; cursor: pointer; transition: background-color 150ms; }
+.edit-toggle:hover { background: rgba(34, 211, 238, 0.16); }
+.edit-toggle.on { background: #22d3ee; color: #0b0d11; border-color: #22d3ee; }
+.edit-toggle.on #editDot { display: none; }
+#layersBtn.on { background: rgba(255, 255, 255, 0.14); border-color: rgba(255, 255, 255, 0.3); color: #fff; }
+
+/* Menu (DR-01) */
+.menu-label { font-size: 13px; color: rgba(255, 255, 255, 0.45); padding: 6px 10px 2px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+.menu-item { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; padding: 9px 10px; border-radius: 8px; font-size: 14px; color: rgba(255, 255, 255, 0.9); cursor: pointer; }
+.menu-item:hover, .menu-item:focus-visible { background: rgba(255, 255, 255, 0.08); outline: none; }
+.menu-item.menu-off { color: rgba(255, 255, 255, 0.4); }
+.menu-sep { height: 1px; background: rgba(255, 255, 255, 0.1); margin: 4px 6px; }
+
+/* Segmented buttons */
+.seg-btn { padding: 6px 8px; border-radius: 8px; font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.78); background: rgba(255, 255, 255, 0.05); cursor: pointer; transition: background-color 150ms; }
+.seg-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.1); }
+.seg-btn.on { background: #fbbf24; color: #0b0d11; font-weight: 600; }
+.seg-btn.on-soft { background: rgba(255, 255, 255, 0.22); color: #fff; font-weight: 600; }
+.seg-btn.on-cyan { background: #22d3ee; color: #0b0d11; font-weight: 600; }
+.seg { gap: 2px; padding: 2px; border-radius: 10px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); flex-shrink: 0; }
+.seg button { padding: 6px 10px; border-radius: 8px; font-size: 13px; color: rgba(255, 255, 255, 0.72); cursor: pointer; }
+.seg button.on { background: rgba(255, 255, 255, 0.2); color: #fff; font-weight: 600; }
+.pop-oct-btn { padding: 5px 0; border-radius: 6px; font-size: 13px; color: rgba(255, 255, 255, 0.72); cursor: pointer; }
+.pop-oct-btn.on { background: rgba(255, 255, 255, 0.22); color: #fff; font-weight: 600; }
+.pop-acc-btn { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.75); cursor: pointer; border: 1px solid transparent; }
+.pop-acc-btn.on { background: rgba(251, 191, 36, 0.25); color: #fcd34d; border-color: rgba(251, 191, 36, 0.5); }
+
+/* Dock (JI-02, UX-02): hidden at rest; cards never overlap, names wrap onto two lines */
+.dock-card { min-width: max-content; background: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.1); }
+.dock-card.muted { background: rgba(0, 0, 0, 0.35); border-color: rgba(255, 255, 255, 0.05); opacity: 0.65; }
+.dock-name { width: 112px; flex: 0 0 112px; }
+.dock-title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
+.mix-btn { background: rgba(255, 255, 255, 0.045); border: 1px solid rgba(255, 255, 255, 0.09); color: rgba(255, 255, 255, 0.72); cursor: pointer; }
+.mix-btn.mute-on { background: #f43f5e; color: #fff; border-color: #f43f5e; }
+.mix-btn.solo-on { background: #fbbf24; color: #0b0d11; border-color: #fbbf24; }
+
+/* Modals */
+.help-card { padding: 10px 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); }
+.setting { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.setting-title { font-size: 15px; font-weight: 600; color: #fff; }
+.setting-help { font-size: 13px; color: rgba(255, 255, 255, 0.55); margin-top: 2px; }
+
+button:disabled { opacity: 0.35; cursor: default; }
+#modePills button.on { background: #fbbf24; color: #0b0d11; font-weight: 600; }
+body.create-mode #holdPeekBtn { display: none; }
+:focus-visible { outline: 2px solid #22d3ee; outline-offset: 2px; }
+#wheelCanvas { touch-action: none; }
+#wheelCanvas:focus { outline: none; }
+.sheet-handle { display: none; }
+
+@keyframes recPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.85); } }
+.rec-dot-pulse { animation: recPulse 1.1s infinite ease-in-out; }
+
+/* Phones: the guide becomes a bottom sheet that never covers the wheel when collapsed */
+@media (max-width: 767px) {
+  #lessonDrawer {
+    position: fixed; left: 8px; right: 8px; bottom: 8px; top: auto; width: auto !important; margin: 0;
+    max-height: 62vh; z-index: 35; opacity: 1; transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  #lessonDrawer.drawer-collapsed { width: auto !important; opacity: 1; pointer-events: auto; border-width: 1px; transform: translateY(calc(100% - 66px)); }
+  .sheet-handle { display: flex; justify-content: center; padding: 8px 0 0; width: 100%; cursor: pointer; }
+  .sheet-handle span { width: 40px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.3); }
+  .stage-caption { bottom: 82px; }
+  body.dock-open #lessonDrawer { display: none; }
+  /* Portrait phones are width-limited, so a taller band costs the wheel nothing. */
+  #wheelStage { padding-bottom: 128px; }
+  .dock > div { flex-wrap: wrap; row-gap: 6px; }
+  #dockTools { border-right: 0; padding-right: 0; }
+  #bottomRingDock { order: 3; flex-basis: 100%; }
+  #ringAddRemove { order: 4; flex-direction: row; border-left: 0; padding-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* ---------- Content pass + pass 3 ---------- */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.lib-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); cursor: pointer; }
+.lib-btn:hover { background: rgba(255, 255, 255, 0.09); border-color: rgba(251, 191, 36, 0.4); }
+.daily-pill { background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.45); color: #fcd34d; cursor: pointer; }
+.daily-pill:hover { background: rgba(251, 191, 36, 0.22); }
+.daily-pill.done { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.12); color: rgba(255, 255, 255, 0.6); }
+.lib-panel { max-height: 100%; height: 100%; }
+@media (min-width: 768px) { .lib-panel { height: min(82vh, 760px); } }
+.lib-chip { flex-shrink: 0; padding: 6px 11px; border-radius: 999px; font-size: 13px; color: rgba(255, 255, 255, 0.78); background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.08); cursor: pointer; white-space: nowrap; }
+.lib-chip.on { background: #fbbf24; color: #0b0d11; font-weight: 600; border-color: #fbbf24; }
+.lib-group { list-style: none; display: flex; justify-content: space-between; padding: 12px 8px 4px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255, 255, 255, 0.5); }
+.lib-group span { font-weight: 500; letter-spacing: 0; }
+.lib-row { list-style: none; display: flex; align-items: center; gap: 4px; border-radius: 12px; }
+.lib-row:hover, .lib-row.cur { background: rgba(255, 255, 255, 0.06); }
+.lib-row.cur { box-shadow: inset 3px 0 0 #fbbf24; }
+.lib-open { flex: 1; min-width: 0; display: flex; align-items: flex-start; gap: 10px; text-align: left; padding: 9px 8px; cursor: pointer; border-radius: 12px; }
+.lib-title { display: block; font-size: 15px; font-weight: 600; color: #fff; line-height: 1.3; }
+.lib-sub { display: block; font-size: 13px; color: rgba(255, 255, 255, 0.55); line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lib-flag { display: inline-block; margin: 2px 6px 0 0; padding: 0 6px; border-radius: 6px; font-size: 11px; font-weight: 600; color: rgba(255, 255, 255, 0.7); background: rgba(255, 255, 255, 0.08); }
+.lib-tick { width: 20px; height: 20px; margin-top: 1px; flex-shrink: 0; border-radius: 999px; border: 1.5px solid rgba(255, 255, 255, 0.25); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+.lib-tick.on { background: #34d399; border-color: #34d399; color: #0b0d11; }
+.lib-fav { width: 40px; height: 40px; flex-shrink: 0; border-radius: 10px; font-size: 18px; color: rgba(255, 255, 255, 0.25); cursor: pointer; }
+.lib-fav:hover { color: rgba(251, 191, 36, 0.7); }
+.lib-fav.on { color: #fbbf24; }
+.lib-badge { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.4); }
+.lib-badge.on { background: rgba(251, 191, 36, 0.15); color: #fcd34d; }
+.lib-empty { list-style: none; padding: 24px 8px; text-align: center; color: rgba(255, 255, 255, 0.55); font-size: 14px; }
+.share-input { flex: 1; min-width: 0; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 10px; padding: 8px 10px; font-size: 13px; color: #fff; resize: none; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.share-input:focus { outline: none; border-color: rgba(251, 191, 36, 0.6); }
+textarea.share-input#assignTask { font-family: inherit; font-size: 14px; }
+.copy-btn { flex-shrink: 0; padding: 0 12px; height: 36px; border-radius: 10px; background: #fbbf24; color: #0b0d11; font-size: 13px; font-weight: 600; cursor: pointer; align-self: flex-start; }
+.mystery-opt { padding: 9px 10px; border-radius: 10px; font-size: 14px; font-weight: 500; color: #fff; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.12); cursor: pointer; text-align: center; }
+.mystery-opt:hover:not(:disabled) { background: rgba(255, 255, 255, 0.14); }
+.mystery-opt.right { background: rgba(52, 211, 153, 0.25); border-color: #34d399; color: #d1fae5; opacity: 1; }
+.mystery-opt.wrong { background: rgba(244, 63, 94, 0.2); border-color: rgba(244, 63, 94, 0.6); color: #fecdd3; }
+body.mystery #wheelStatic, body.mystery #wheelCanvas { filter: blur(18px) saturate(1.2); }
+body.mystery #lessonDrawer, body.mystery .stage-caption, body.mystery #stageScenes, body.mystery #editBadge, body.mystery #dock { visibility: hidden; }
+body.locked-item #editToggle { opacity: 0.45; }
+/* See the beat (visual rhythm) */
+@keyframes beatFlash { from { box-shadow: inset 0 0 0 3px rgba(251, 191, 36, 0.55); } to { box-shadow: inset 0 0 0 3px rgba(251, 191, 36, 0); } }
+@keyframes beatOne { from { box-shadow: inset 0 0 0 8px rgba(251, 191, 36, 0.95), inset 0 0 60px rgba(251, 191, 36, 0.35); } to { box-shadow: inset 0 0 0 8px rgba(251, 191, 36, 0); } }
+#wheelStage.beat-flash { animation: beatFlash 220ms ease-out; }
+#wheelStage.beat-one { animation: beatOne 320ms ease-out; }
+/* Embed and projector views */
+body.embed #modePills, body.embed #toggleDrawerBtn, body.embed #dailyBtn, body.embed #layersBtn, body.embed #editToggle, body.embed #moreBtn, body.embed #lessonDrawer { display: none !important; }
+body.present #dailyBtn, body.present #modePills { display: none !important; }
+body.present .stage-caption { font-size: 26px; line-height: 1.3; max-width: 900px; }
+@media (prefers-reduced-motion: reduce) { #wheelStage.beat-flash, #wheelStage.beat-one { animation: none !important; box-shadow: inset 0 0 0 4px rgba(251, 191, 36, 0.6); } }
+/* Header icons: each at its own optical size (filled shapes smaller, thin diagonals and circles larger) */
+.hdr-play { width: 11px; height: 14px; margin-left: 1px; overflow: visible; }
+.hdr-pause { width: 14px; height: 14px; }
+.hdr-edit { width: 16px; height: 16px; overflow: visible; }
+.hdr-more { width: 16px; height: 16px; }
+.hdr-create { width: 24px; height: 24px; }
+.hdr-book { width: 22px; height: 22px; }
+/* Phones: Create is a front-row icon button; Play, Edit, Create and More are 40 × 40 squares */
+.create-fab { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); color: #fff; cursor: pointer; }
+.create-fab:hover { background: rgba(255, 255, 255, 0.1); }
+.create-fab.on { background: rgba(52, 211, 153, 0.14); border-color: rgba(52, 211, 153, 0.5); color: #6ee7b7; }
+@media (max-width: 639px) {
+  #playPauseBtn, #editToggle, #mobileCreateBtn, #moreBtn { width: 40px; height: 40px; padding: 0; justify-content: center; }
+  #libraryBtn { height: 40px; }
+  .hdr-play { width: 13px; height: 16px; margin-left: 1.5px; }
+  .hdr-pause { width: 16px; height: 16px; }
+  .hdr-edit { width: 22px; height: 22px; }
+  .hdr-more { width: 18px; height: 18px; }
+}
