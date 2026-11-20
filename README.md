@@ -1,4 +1,4 @@
-# Concentric · Music on wheels
+# Music on Wheels · Concentric
 
 **See music, hear it, and make your own: rhythm, harmony and melody drawn as rings on a wheel.**
 
