@@ -199,7 +199,7 @@ function matchPct() {
 }
 function updateMatch() {
   if (!state.tryMode || isCreate()) return;
-  $('editBadgeText').textContent = `Editing — your version · ${matchPct()}% like the original`;
+  $('editBadgeText').textContent = isMobile() ? `Editing · ${matchPct()}% like the original` : `Editing — your version · ${matchPct()}% like the original`;
 }
 function undo() {
   if (!state.undo.length) return;
@@ -390,6 +390,7 @@ function loadItem(id, keepScene = false) {
   if (!keepScene) state.activeSceneIndex = 0;
   state.tryMode = false; state.peekHolding = false;
   state.mix = emptyMix();
+  state.dockRing = 0;
   state.remix = { swing: null, faster: !!(item.autoRemix && item.autoRemix.faster), build: !!(item.autoRemix && item.autoRemix.build) };
   state.buildLevel = state.remix.build ? 1 : 99;
   state.undo = []; state.redo = [];
@@ -585,7 +586,16 @@ function renderDock() {
   if (mode === 'none') { dock.innerHTML = ''; return; }
   const full = mode === 'edit';
   const rings = getActiveRings();
-  dock.innerHTML = rings.map((ring, r) => {
+  // Phones: one ring at a time. A row of ring tabs picks which ring's controls show, so nothing scrolls sideways.
+  const phone = isMobile();
+  if (phone) state.dockRing = Math.max(0, Math.min(rings.length - 1, state.dockRing || 0));
+  const tabs = phone ? `<div class="ring-tabs" role="tablist" aria-label="Choose a ring">${rings.map((ring, r) => {
+    const role = ring.role || defaultRole(r, rings.length, ring.instrument);
+    return `<button role="tab" data-ring="${r}" aria-selected="${r === state.dockRing}" class="ring-tab${r === state.dockRing ? ' on' : ''}${isAudible(r) ? '' : ' muted'}"><span class="w-2 h-2 rounded-full ${ROLE_COLOR[role] || 'bg-white/50'} shrink-0"></span><span class="truncate">${esc(ring.name)}</span></button>`;
+  }).join('')}</div>` : '';
+  dock.classList.toggle('dock-phone', phone);
+  dock.innerHTML = tabs + rings.map((ring, r) => {
+    if (phone && r !== state.dockRing) return '';
     const role = ring.role || defaultRole(r, rings.length, ring.instrument);
     const steps = [...new Set([3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 24, 32, ring.steps.length])].sort((a, b) => a - b);
     return `<div class="dock-card flex items-center gap-2 px-2.5 py-1.5 rounded-xl border" data-r="${r}">
@@ -624,6 +634,7 @@ function renderDock() {
   $('dockTools').classList.toggle('hidden', !full);
 }
 function updateMixUI() {
+  $('bottomRingDock').querySelectorAll('.ring-tab').forEach(t => t.classList.toggle('muted', !isAudible(Number(t.dataset.ring))));
   $('bottomRingDock').querySelectorAll('.dock-card').forEach(card => {
     const r = Number(card.dataset.r), audible = isAudible(r);
     card.classList.toggle('muted', !audible);
@@ -642,6 +653,8 @@ function updateDockValues() {
 }
 const dockEl = $('bottomRingDock');
 dockEl.addEventListener('click', e => {
+  const t = e.target.closest('button[data-ring]');
+  if (t) { state.dockRing = Number(t.dataset.ring); renderDock(); return; }
   const b = e.target.closest('button[data-act]'); if (!b) return;
   const r = Number(b.closest('.dock-card').dataset.r), act = b.dataset.act;
   if (act === 'mute' || act === 'solo') {
@@ -968,6 +981,7 @@ function hover(x, y, clientX, clientY) {
 
 function toggleDot(r, s) {
   if (isLocked()) { lockedToast(); return; }
+  if (isMobile() && state.dockRing !== r) { state.dockRing = r; setTimeout(renderDock, 0); }
   edit(rs => {
     const ring = rs[r], step = ring.steps[s];
     if (step.active) { step.active = false; return; }
@@ -1255,6 +1269,7 @@ $('addRingBtn').onclick = () => {
     const instrument = i === 1 ? 'grand_piano' : i === 2 ? 'marimba' : 'percussion';
     rs.push({ name: `Layer ${i + 1}`, instrument, role: instrument === 'percussion' ? 'percussion' : 'melody', steps: makeSteps(state.beats) });
   }, { structural: true });
+  state.dockRing = state.userRings.length - 1; renderDock();
 };
 $('removeRingBtn').onclick = () => {
   if (state.userRings.length <= 1) { showToast('At least one ring stays.'); return; }
@@ -1264,7 +1279,50 @@ $('removeRingBtn').onclick = () => {
 
 $('toggleDrawerBtn').onclick = () => setDrawerOpen(!state.drawerOpen);
 $('collapseDrawerBtn').onclick = () => setDrawerOpen(false);
-$('sheetHandle').onclick = () => setDrawerOpen(!state.drawerOpen);
+$('sheetHandle').onclick = () => { if (sheetDrag.justDragged) return; setDrawerOpen(!state.drawerOpen); };
+
+// Phones: the guide is a bottom sheet. Swipe it up or down by its top strip (or anywhere on it while it is
+// collapsed); a tap on the collapsed strip opens it. The sheet follows the finger and settles on release.
+const sheetDrag = { justDragged: false };
+(() => {
+  const d = $('lessonDrawer'), PEEK = 66;
+  let drag = null;
+  const canStart = e => {
+    if (!isMobile() || document.body.classList.contains('dock-open')) return false;
+    if (e.target.closest('#sheetHandle')) return true;
+    if (e.target.closest('button, a, input, select, textarea, [role="button"]')) return false;
+    if (!state.drawerOpen) return true;                                   // collapsed: the whole visible strip
+    return e.clientY - d.getBoundingClientRect().top < 56;                 // open: only the top strip
+  };
+  d.addEventListener('pointerdown', e => {
+    if (!canStart(e)) return;
+    const h = d.offsetHeight;
+    drag = { id: e.pointerId, y0: e.clientY, base: state.drawerOpen ? 0 : h - PEEK, max: h - PEEK, moved: false, t0: performance.now() };
+  });
+  d.addEventListener('pointermove', e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dy = e.clientY - drag.y0;
+    if (!drag.moved && Math.abs(dy) < 8) return;
+    if (!drag.moved) { drag.moved = true; d.setPointerCapture(e.pointerId); d.style.transition = 'none'; }
+    d.style.transform = `translateY(${Math.max(0, Math.min(drag.max, drag.base + dy))}px)`;
+    e.preventDefault();
+  });
+  const end = e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const g = drag; drag = null;
+    d.style.transition = ''; d.style.transform = '';
+    if (!g.moved) { // a tap on the collapsed strip opens the guide
+      if (!state.drawerOpen && !e.target.closest('#sheetHandle') && e.type === 'pointerup') setDrawerOpen(true);
+      return;
+    }
+    const dy = e.clientY - g.y0, fast = Math.abs(dy) / Math.max(1, performance.now() - g.t0) > 0.5;
+    const open = (fast || Math.abs(dy) > 60) ? dy < 0 : state.drawerOpen;
+    setDrawerOpen(open);
+    sheetDrag.justDragged = true; setTimeout(() => { sheetDrag.justDragged = false; }, 300);
+  };
+  d.addEventListener('pointerup', end);
+  d.addEventListener('pointercancel', end);
+})();
 $('behindSoundToggle').onclick = () => {
   state.behindSoundOpen = !state.behindSoundOpen;
   $('behindSoundBody').classList.toggle('hidden', !state.behindSoundOpen);
@@ -1325,6 +1383,12 @@ window.addEventListener('keydown', e => {
 window.addEventListener('keyup', e => { if (e.code === 'Space' && e.target.tagName === 'BUTTON') e.preventDefault(); });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) requestDraw(); });
 
+// Phones: the wheel's bottom band follows the dock's real height, so the dock never covers the wheel.
+new ResizeObserver(() => {
+  const h = $('dock').classList.contains('hidden') ? 0 : $('dock').offsetHeight;
+  document.documentElement.style.setProperty('--dock-h', `${Math.max(128, h)}px`);
+}).observe($('dock'));
+
 // Canvas sizing follows its container (drawer open/close, rotation, window resize) — LT-10
 new ResizeObserver(entries => {
   const r = entries[0].contentRect;
@@ -1335,6 +1399,11 @@ new ResizeObserver(entries => {
 // Offline support (DR-05)
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost') && !DEBUG) {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  // When a newly published version takes over, reload once so the page uses the new files straight away.
+  if (navigator.serviceWorker.controller) {
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => { if (reloaded || state.isPlaying) return; reloaded = true; location.reload(); });
+  }
 }
 
 // ---------- Library (replaces the long dropdown) ----------

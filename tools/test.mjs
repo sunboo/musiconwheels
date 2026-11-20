@@ -44,7 +44,9 @@ const dotXY = (p, r, s) => p.evaluate(([r, s]) => {
   let s = await p.evaluate(() => ({ user: window.__bench.state.userRings[0].steps[2].active, ref: window.__bench.state.referenceRings[0].steps[2].active, edit: window.__bench.state.tryMode }));
   check('LT-03 click removes an active dot', s.user === false && s.edit, JSON.stringify(s));
   check('LT-04 reference untouched by the edit', s.ref === true);
-  await p.mouse.click(x, y);
+  await p.waitForTimeout(300); // the Edit controls opened and the wheel resized to sit above them: aim again
+  const [x2, y2] = await dotXY(p, 0, 2);
+  await p.mouse.click(x2, y2);
   s = await p.evaluate(() => window.__bench.state.userRings[0].steps[2].active);
   check('LT-03 second click adds it back', s === true);
   await p.evaluate(() => window.__bench.loadItem('1.3'));
