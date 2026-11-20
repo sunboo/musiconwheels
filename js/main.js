@@ -179,7 +179,7 @@ function edit(fn, { structural = false } = {}) {
   if (structural) renderDock(); else updateDockValues();
   updateUndoUI();
   if (!edit.tracked) { edit.tracked = true; track('edit'); }
-  if (isCreate()) celebrate(progress.earn('composer'));
+  if (isCreate()) { celebrate(progress.earn('composer')); if (!edit.created) { edit.created = true; track('create-first-edit'); } }
   updateMatch();
 }
 /** How close your version is to the original (shown while editing). */
@@ -441,7 +441,7 @@ function loadItem(id, keepScene = false) {
   document.body.classList.toggle('locked-item', !!item.locked);
   if (mystery.mode && !mystery.loading) endMystery(false);
   state.createDock = false;
-  if (item.isCreate) enterEditMode();   // Create mode starts in Edit with the brush ready (POST-06)
+  if (item.isCreate) { enterEditMode(); track('create-open'); }   // Create mode starts in Edit with the brush ready (POST-06)
   else if (state.userEdited) showToast('Your saved edits are kept. Press Edit to see them.');
   if (item.isCreate && state.userEdited) showToast('Your saved sketch is back. Reset returns to the template.');
   if (wasPlaying) startPlayback();
@@ -1213,7 +1213,7 @@ $('stopMenuBtn').onclick = stopAndReset;
 $('recordAudioBtn').onclick = () => !(blockedShare() && !audio.isRecording) && audio.toggleRecording(rec => {
   $('recLabel').textContent = rec ? 'Stop recording and save' : 'Record audio';
   $('recBadge').classList.toggle('hidden', !rec);
-  if (rec) track('record');
+  track(rec ? 'audio-record-start' : 'audio-record-saved');
 }, showToast);
 
 $('exportJsonBtn').onclick = () => {
@@ -1367,39 +1367,90 @@ $('shareLinkBtn').onclick = async () => {
   track('share-open');
 };
 $('assignTask').addEventListener('input', updateAssign);
-$('nativeShareBtn').onclick = () => { navigator.share({ title: currentItem().title + ' — Concentric', url: $('shareLinkInput').value }).catch(() => {}); };
+$('nativeShareBtn').onclick = () => { navigator.share({ title: currentItem().title + ' — Concentric', url: $('shareLinkInput').value }).then(() => track('share-link-sent')).catch(() => {}); };
 document.querySelectorAll('.copy-btn').forEach(b => b.onclick = async () => {
   const el = $(b.dataset.copy);
   try { await navigator.clipboard.writeText(el.value); } catch (e) { el.select(); try { document.execCommand('copy'); } catch (e2) {} }
+  track({ shareLinkInput: 'share-link-copied', embedInput: 'share-embed-copied', presentInput: 'share-projector-copied', assignInput: 'share-assignment-copied' }[b.dataset.copy] || 'share-copied');
   const old = b.textContent; b.textContent = 'Copied'; setTimeout(() => { b.textContent = old; }, 1400);
 });
 
 // ---------- Poster and 9:16 video ----------
 const eduNotice = () => { const it = currentItem(); if (it.isFamousSong && it.rights !== 'pd') showToast('Educational arrangement: fine for study and sharing with credit, not for commercial use.', 4200); };
-const exportMeta = () => { const it = currentItem(), sc = currentScene(it); return { stat: $('wheelStatic'), dyn: canvas, title: it.title.replace(/^\d+\.\s*/, ''), sub: sc ? sc.hook : it.hook, footer: `${location.host || 'concentric'} · see music on a circle`, file: it.id }; };
-$('posterBtn').onclick = () => {
+// Title and composer for exports: remembered per piece (title) and per browser (your name).
+const titleKey = () => `concentric-title:${state.currentItemId}`;
+const defaultTitle = () => (isCreate() ? 'Untitled sketch' : currentItem().title.replace(/^\d+(\.\d+)?\.?\s*/, ''));
+let exportKind = null;
+function openExport(kind) {
+  if (kind === 'video' && stopVideo) { stopVideo(); return; }
   if (blockedShare()) return;
-  eduNotice();
-  renderer.invalidate(); renderer.draw();
-  exportPoster({ ...exportMeta(), caption: $('stageCaption').textContent }).then(ok => { if (ok) { showToast('Poster saved.'); track('poster'); } });
+  exportKind = kind;
+  $('expHeading').textContent = kind === 'video' ? 'Video for Reels / Shorts (9:16)' : 'Poster image (PNG)';
+  $('expTitle').value = store.get(titleKey()) || defaultTitle();
+  $('expComposer').value = settings.composer || '';
+  $('expGo').textContent = kind === 'video' ? 'Record video' : 'Save poster';
+  $('expCaptionsRow').classList.toggle('hidden', isCreate());
+  $('expCaptions').checked = !isCreate() && settings.exportCaptions !== 'off';
+  openModal('exportModal');
+  $('expTitle').focus(); $('expTitle').select();
+}
+/** One line under the wheel on posters and videos, above the address. */
+const TAGLINE = 'Music — made on wheels';
+/** "sunboo.github.io/musiconwheels": the address people can type, without https:// or index.html. */
+/**
+ * A private, off-screen copy of the wheel for posters and videos: drawn at a fixed 2× scale (sharp at any
+ * phone size), with no edit outline, hover or focus marks. Posters are a still frame: needle at 12:00, no
+ * playing wedge or ripples. Videos follow the live needle.
+ */
+const NO_FLASH = new Float64Array(8 * 128).fill(-1), NO_DUR = new Float32Array(8 * 128).fill(0.3);
+function exportRenderer(cssSide, live) {
+  const r = new WheelRenderer(document.createElement('canvas'), document.createElement('canvas'), () => ({
+    ...renderer.view(), hovered: null, editing: null, focus: null, editMode: false,
+    ...(live ? {} : { playing: false, phase: 0, flash: NO_FLASH, flashDur: NO_DUR })
+  }));
+  r.fixedDpr = 2;
+  r.resize(cssSide, cssSide);
+  r.draw();
+  return r;
+}
+const siteLabel = () => ((location.host + location.pathname).replace(/index\.html$/, '').replace(/\/$/, '') || 'concentric');
+const exportMeta = () => {
+  const title = ($('expTitle').value.trim() || defaultTitle()).slice(0, 80);
+  const composer = $('expComposer').value.trim().slice(0, 60);
+  return { stat: $('wheelStatic'), dyn: canvas, title, byline: composer ? `Composed by ${composer}` : '', clean: true,
+    tagline: TAGLINE, footer: siteLabel(), file: (title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'concentric').slice(0, 40) };
 };
+$('posterBtn').onclick = () => openExport('poster');
 let stopVideo = null;
 function videoState(on) { $('videoLabel').textContent = on ? 'Stop video and save' : 'Video for Reels / Shorts (9:16)'; $('recBadge').classList.toggle('hidden', !on); }
-$('videoBtn').onclick = () => {
-  if (stopVideo) { stopVideo(); return; }
-  if (blockedShare()) return;
+$('videoBtn').onclick = () => openExport('video');
+$('exportForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const meta = exportMeta(), captions = $('expCaptions').checked;
+  store.set(titleKey(), meta.title);
+  settings.composer = $('expComposer').value.trim().slice(0, 60);
+  if (!isCreate()) settings.exportCaptions = captions ? 'on' : 'off';
+  saveSettings();
+  closeModals();
   eduNotice();
+  const caption = () => (captions ? $('stageCaption').textContent : '');
+  if (exportKind === 'poster') {
+    const still = exportRenderer(540, false);
+    exportPoster({ ...meta, stat: still.layer, dyn: still.canvas, caption: caption() }).then(ok => { if (ok) { showToast('Poster saved.'); track('poster'); } });
+    return;
+  }
   audio.unlock(); audio.ensureContext();
   stopAndReset();
   startPlayback();
   const seconds = Math.max(6, Math.min(30, loopSeconds() * 2));
+  const live = exportRenderer(360, true);
   stopVideo = recordVideo({
-    meta: exportMeta(), getCaption: () => $('stageCaption').textContent, audioStream: audio.recDest && audio.recDest.stream, seconds,
+    meta: { ...meta, stat: live.layer, dyn: live.canvas }, getCaption: caption, beforeFrame: () => live.draw(), audioStream: audio.recDest && audio.recDest.stream, seconds,
     onDone: fmt => { stopVideo = null; videoState(false); pausePlayback(); showToast(`Video saved (${fmt}, 9:16).`); track('video'); },
     onError: msg => { stopVideo = null; videoState(false); showToast(msg, 4200); }
   });
   if (stopVideo) { videoState(true); showToast(`Recording ${Math.round(seconds)} s of video…`); }
-};
+});
 
 // ---------- Show the notes ----------
 $('notesBtn').onclick = () => {
@@ -1522,7 +1573,7 @@ function startDaily() {
 }
 function showDailyShare(st, n) {
   const sec = $('mysteryShare'); sec.classList.remove('hidden'); sec.textContent = 'Copy result';
-  sec.onclick = async () => { const t = dailyShareText(st, n); try { await navigator.clipboard.writeText(t); showToast('Result copied. Paste it anywhere.'); } catch (e) { showToast(t, 5000); } };
+  sec.onclick = async () => { const t = dailyShareText(st, n); try { await navigator.clipboard.writeText(t); showToast('Result copied. Paste it anywhere.'); track('daily-result-copied'); } catch (e) { showToast(t, 5000); } };
 }
 $('mysteryOptions').addEventListener('click', e => {
   const b = e.target.closest('[data-opt]'); if (!b || mystery.done) return;

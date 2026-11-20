@@ -33,7 +33,7 @@ export class WheelRenderer {
     const side = Math.floor(Math.min(stageW, stageH));
     const w = side, h = side;
     this.w = w; this.h = h;
-    this.dpr = Math.min(this.maxDpr, window.devicePixelRatio || 1);
+    this.dpr = this.fixedDpr || Math.min(this.maxDpr, window.devicePixelRatio || 1); // exports render at a fixed, sharp scale
     for (const c of [this.canvas, this.layer]) {
       c.width = Math.round(w * this.dpr);
       c.height = Math.round(h * this.dpr);
