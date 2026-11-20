@@ -246,3 +246,21 @@ body.present .stage-caption { font-size: 26px; line-height: 1.3; max-width: 900p
 @media (min-width: 768px) and (max-width: 1399px) {
   #bottomRingDock .dock-card label > span { display: none; }
 }
+
+/* Phones: fit the real visible screen. 100vh includes the area behind the browser's address and tool bars,
+   so the bottom of the app (the last row of Edit controls) could sit hidden under them. */
+body.h-screen { height: 100vh; height: 100dvh; }
+@supports (height: 100dvh) { #lessonDrawer { max-height: 62dvh; } }
+/* Keep controls clear of the iPhone home indicator */
+.dock { padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+@media (max-width: 767px) {
+  #lessonDrawer { bottom: max(8px, env(safe-area-inset-bottom)); }
+}
+
+/* Phones: the open guide tray has a fixed height (about 40% of the screen) and scrolls inside itself.
+   The wheel moves up into the space above it, so the tray never covers the wheel. */
+@media (max-width: 767px) {
+  #lessonDrawer { height: 40vh; height: 40dvh; max-height: none; }
+  #lessonDrawer .custom-scroll { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+  body:not(.drawer-closed):not(.dock-open) #wheelStage { padding-bottom: calc(40vh + 12px); padding-bottom: calc(40dvh + 12px); }
+}

@@ -280,7 +280,7 @@ const dotXY = (p, r, s) => p.evaluate(([r, s]) => {
   check('Library: category chip filters; favourites toggle', anthems.length === 2 && anthems.every(i => i.startsWith('anthem')) && fav, JSON.stringify(anthems));
   const counts = await p.evaluate(async () => { const C = (await import('./js/content.js')).CURRICULUM; return { pd: C.filter(i => i.rights === 'pd' && i.id.startsWith('pd-')).length, total: C.length, m7: C.filter(i => i.id.startsWith('7.')).length, m8: C.filter(i => i.id.startsWith('8.')).length }; });
   check('Catalogue: 28 public-domain songs, Module 7 (6 lessons) and Module 8 (3 lessons)', counts.pd === 28 && counts.m7 === 6 && counts.m8 === 3, JSON.stringify(counts));
-  await p.evaluate(() => window.__bench.loadItem('anthem-usa'));
+  await p.evaluate(() => window.__bench.loadItem('anthem-usa')); await p.waitForTimeout(300);
   await p.click('#editToggle', { force: true });
   const [x, y] = await dotXY(p, 2, 0); await p.mouse.click(x, y);
   const locked = await p.evaluate(() => ({ edit: window.__bench.state.tryMode, ref: window.__bench.state.referenceRings[2].steps[0].active, user: window.__bench.state.userRings[2].steps[0].active }));
