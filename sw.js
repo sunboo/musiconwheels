@@ -1,6 +1,6 @@
 // Offline support: the app shell is cached on first visit. Online, files come fresh from the server.
 // Bump VERSION when you publish changes so returning visitors get them.
-const VERSION = 'concentric-v3.1.2';
+const VERSION = 'concentric-v3.1.4';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'css/app.css',
   'js/main.js', 'js/content.js', 'js/theory.js', 'js/audio.js', 'js/scheduler.js', 'js/clock-worker.js',
