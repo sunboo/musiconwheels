@@ -368,6 +368,22 @@
       </div>
     </div>
 
+    <div id="exportModal" class="modal fixed inset-0 bg-black/65 hidden z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="expHeading">
+      <form id="exportForm" class="frosted-popover max-w-md w-full rounded-2xl p-5 space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 id="expHeading" class="text-[20px] font-semibold text-white">Video</h2>
+          <button type="button" class="modal-close w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-[13px] flex items-center justify-center" aria-label="Close">✕</button>
+        </div>
+        <label class="block space-y-1.5"><span class="setting-title">Name of the piece</span>
+          <input id="expTitle" maxlength="80" class="share-input w-full" style="font-family:inherit;font-size:15px" autocomplete="off" /></label>
+        <label class="block space-y-1.5"><span class="setting-title">Composed by</span>
+          <input id="expComposer" maxlength="60" class="share-input w-full" style="font-family:inherit;font-size:15px" placeholder="Your name (optional)" autocomplete="name" /></label>
+        <label id="expCaptionsRow" class="flex items-center gap-2 text-[14px] text-white/80"><input id="expCaptions" type="checkbox" class="accent-amber-400 w-4 h-4" /> Show the beat-by-beat caption under the wheel</label>
+        <p class="setting-help">The video shows the wheel, the name and the composer. Your name is remembered on this device only.</p>
+        <button id="expGo" type="submit" class="w-full h-11 rounded-xl bg-amber-400 hover:bg-amber-300 text-neutral-950 font-semibold text-[15px] cursor-pointer">Record video</button>
+      </form>
+    </div>
+
     <div id="notesModal" class="modal fixed inset-0 bg-black/65 hidden z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="notesTitle">
       <div class="frosted-popover max-w-3xl w-full rounded-2xl p-5 space-y-3 max-h-[90vh] overflow-y-auto custom-scroll">
         <div class="flex items-center justify-between">

@@ -42,7 +42,17 @@ Cookie-free page and event counts with [GoatCounter](https://www.goatcounter.com
 export const CONFIG = { goatcounter: 'your-code' };
 ```
 
-The app then counts these events: first visit, play, lesson complete (two full loops), edit, recording, preset saved, and day-1 / 7 / 30 returns. Nothing is sent while the code is empty, on localhost, or when the browser's Do Not Track is on.
+The app then counts these events (they appear in GoatCounter as paths starting with `event/`):
+
+| Area | Events |
+|---|---|
+| Visits | `first-visit`, `return-d1`, `return-d7`, `return-d30` |
+| Listening and learning | `play`, `lesson-complete` (two full loops), `notes`, `ear-right`, `ear-wrong` |
+| Create | `create-open`, `create-first-edit`, `random-groove`, `edit` |
+| Video, poster, audio | `video` (saved), `poster` (saved), `audio-record-start`, `audio-record-saved`, `export` (preset file) |
+| Sharing | `share-open` (share box opened), `share-link-copied`, `share-link-sent` (phone share sheet), `share-embed-copied`, `share-projector-copied`, `share-assignment-copied`, `share-open-link` (someone opened a shared version) |
+| Daily puzzle | `daily-open`, `daily-solved`, `daily-failed`, `daily-result-copied` |
+
 
 ## Automatic checks
 
@@ -95,6 +105,7 @@ tools/bench.mjs       performance benchmark  (Playwright), incl. a 200 KB gz dow
 tools/seo.mjs         static page per lesson/song + sitemap.xml + robots.txt
 learn/                generated SEO pages (re-run tools/seo.mjs with your real URL)
 LICENSE, CONTENT-LICENSE.md, NOTICE.txt, privacy.html, terms.html
+ROADMAP.md            released versions and what's next
 tools/css-build/      Tailwind config + source CSS (only needed if you change classes)
 ```
 

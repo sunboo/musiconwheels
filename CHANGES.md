@@ -138,4 +138,4 @@ Item IDs refer to the critique board.
 
 ## Next
 
-- **Pass 3 (growth):** JI-01/MB-01 opener and mystery mode, MB-02 daily puzzle, MB-03 video export, MB-04 scoring and progress, MB-06 Remix (+ Time "Build"), RS-02 share links, RS-03 embeds, RS-04 taals and sargam, RS-07 search pages, RS-06 projector view and assignment links.
+See [ROADMAP.md](ROADMAP.md).
